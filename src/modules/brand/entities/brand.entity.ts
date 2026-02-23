@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { BrandStatus } from '../../../common/enums/brand-status.enum';
+import { Article } from '../../article/entities/article.entity';
 
 @Entity('brands')
 export class Brand {
@@ -34,11 +35,14 @@ export class Brand {
 
   // Admin who created this brand
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'createdBy' }) 
+  @JoinColumn({ name: 'createdBy' })
   createdBy: User;
 
   @OneToMany(() => User, (user) => user.brand)
   users: User[];
+
+  @OneToMany(() => Article, (article) => article.brand)
+  articles: Article[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -3,4 +3,5 @@ export enum Role {
   AUTHOR = 'AUTHOR',
   ADMIN = 'ADMIN',
   SUPERADMIN = 'SUPERADMIN',
+  BRAND = 'BRAND',
 }

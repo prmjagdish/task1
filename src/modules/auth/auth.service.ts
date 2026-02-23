@@ -40,14 +40,15 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  private generateToken(user: any) {
-    const payload = {
-      sub: user.id,
-      role: user.role,
-    };
+ private generateToken(user: any) {
+  const payload = {
+    sub: user.id,
+    role: user.role,
+    brandId: user.brand?.id ?? null,
+  };
 
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
+  return {
+    access_token: this.jwtService.sign(payload),
+  };
+}
 }
