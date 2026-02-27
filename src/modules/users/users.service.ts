@@ -14,16 +14,18 @@ export class UsersService {
     private userRepo: Repository<User>,
   ) {}
 
-  async findByEmail(email: string, includePassword = false) {
+ async findByEmail(email: string, includePassword = false) {
   if (includePassword) {
     return this.userRepo.findOne({
       where: { email },
       select: ['id', 'email', 'password', 'role'],
+      relations: ['brand'], 
     });
   }
 
   return this.userRepo.findOne({
     where: { email },
+    relations: ['brand'],
   });
 }
 

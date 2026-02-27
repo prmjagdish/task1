@@ -57,7 +57,7 @@ export class BrandService {
         const brandUser = manager.create(User, {
           email: dto.email,
           password: hashedPassword,
-          role: Role.USER,
+          role: Role.BRAND,
           brand: savedBrand,
         });
 
