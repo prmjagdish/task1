@@ -9,30 +9,31 @@ import {
   Request,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { UpdateArticleStatusDto } from './dto/update-article-status.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { ArticleStatus } from '../../common/enums/ArticleStatus.enum';
 
 @Controller('articles')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
-  // Create Article
+  // ================= CREATE =================
   @Post()
   @Roles(Role.BRAND, Role.AUTHOR)
   create(@Body() dto: CreateArticleDto, @Request() req) {
-    console.log('Creating article with DTO:', dto);
-    console.log('Current user:', req.user);
     return this.articleService.create(dto, req.user);
   }
 
-  // Update Article
+  // ================= UPDATE CONTENT =================
   @Put(':id')
   @Roles(Role.BRAND, Role.AUTHOR)
   update(
@@ -43,7 +44,7 @@ export class ArticleController {
     return this.articleService.update(id, dto, req.user);
   }
 
-  // Delete Article
+  // ================= DELETE =================
   @Delete(':id')
   @Roles(Role.BRAND, Role.AUTHOR)
   delete(
@@ -53,19 +54,52 @@ export class ArticleController {
     return this.articleService.delete(id, req.user);
   }
 
-  // List Articles by Brand
+  // ================= BRAND LIST =================
   @Get('brand/:brandId')
   @Roles(Role.ADMIN, Role.SUPERADMIN, Role.BRAND)
   listBrand(
     @Param('brandId', ParseIntPipe) brandId: number,
+    @Query('status') status?: ArticleStatus,
   ) {
-    return this.articleService.listBrandArticles(brandId);
+    return this.articleService.listBrandArticles(brandId, status);
   }
 
-  // List Own Articles (Author)
+  // ================= AUTHOR LIST =================
   @Get('my')
   @Roles(Role.AUTHOR)
-  listOwn(@Request() req) {
-    return this.articleService.listOwnArticles(req.user.userId);
+  listOwn(
+    @Request() req,
+    @Query('status') status?: ArticleStatus,
+  ) {
+    return this.articleService.listOwnArticles(
+      req.user.userId,
+      status,
+    );
+  }
+
+  // ================= ADMIN LIST =================
+  @Get()
+  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  listAll(
+    @Query('brandId') brandId?: number,
+    @Query('authorId') authorId?: string,
+    @Query('status') status?: ArticleStatus,
+  ) {
+    return this.articleService.listAll(brandId, authorId, status);
+  }
+
+  // ================= CHANGE STATUS =================
+  @Put(':id/status')
+  @Roles(Role.ADMIN, Role.SUPERADMIN, Role.BRAND, Role.AUTHOR)
+  changeStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateArticleStatusDto,
+    @Request() req,
+  ) {
+    return this.articleService.changeStatus(
+      id,
+      dto.status,
+      req.user,
+    );
   }
 }

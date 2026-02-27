@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Brand } from '../../brand/entities/brand.entity';
 import { User } from '../../users/entities/user.entity';
+import { ArticleStatus } from '../../../common/enums/ArticleStatus.enum';
 
 @Entity('articles')
 export class Article {
@@ -32,6 +33,13 @@ export class Article {
   })
   @JoinColumn({ name: 'authorId' })
   author: User;
+
+  @Column({
+    type: 'enum',
+    enum: ArticleStatus,
+    default: ArticleStatus.DRAFT,
+  })
+  status: ArticleStatus;
 
   @CreateDateColumn()
   createdAt: Date;
